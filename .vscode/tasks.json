@@ -6,9 +6,9 @@
             "command": "C:/raylib/w64devkit/bin/gcc.exe",
             "args": [
                 "-g",
-                "main.c",
+                "${file}",
                 "-o",
-                "main.exe",
+                "${fileBasenameNoExtension}",
                 "-IC:/raylib/raylib/src",
                 "-LC:/raylib/raylib/src",
                 "-lraylib",
