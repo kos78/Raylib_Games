@@ -53,12 +53,13 @@ void ball_collision_Detection(ball * b,  int y){
 }
 
 void ball_Paddle_collision(paddle *p1, paddle *p2, ball * b){
-    if(p1->x + p1->width == b->x + b-> radius || p1->x + p1->width == b->x - b-> radius){
+    if(CheckCollisionCircleRec((Vector2){b->x, b->y}, b->radius, (Rectangle){p1->x, p1->y, p1->width, p1->height} ))
+    {
         b->speed_x *= -1;
         
     }
     
-    if (p2->x + p2->width == b->x + b-> radius || p2->x + p2->width == b->x - b-> radius){
+    if (CheckCollisionCircleRec((Vector2){b->x, b->y}, b->radius, (Rectangle){p2->x, p2->y, p2->width, p2->height} )){
         b->speed_x *= -1;
         printf("Connect2\n");
     }
