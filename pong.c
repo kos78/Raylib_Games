@@ -40,15 +40,32 @@ void eventHandling(paddle *p, int speed){
      
 }
 
-void ball_collision_Detection(ball * b,  int y){
+
+
+void ball_collision_Detection(ball * b, int * player_score, int * cpu_score){
+    int random_speed [2] = {-1, 1};
 
     if (b->radius + b->y >= GetScreenHeight() || b->y - b->radius <= 0 ) // check if it bounces on the bottom or top of screen
     {
         b->speed_y *= -1;
     }
-    if (b->radius + b->x >= GetScreenWidth() || b->x - b->radius <= 0 )
+    if (b->radius + b->x >= GetScreenWidth())
     {
-        b->speed_x *= -1;
+        b->x = SCREEN_WIDTH / 2;
+        b->y = SCREEN_HEIGHT / 2;
+        b->speed_y *= random_speed[GetRandomValue(0,1)];
+        b->speed_x *= random_speed[GetRandomValue(0,1)];
+        (*player_score)++;
+        
+        
+    }
+    else if (b->x - b->radius <= 0){
+        b->x = SCREEN_WIDTH / 2;
+        b->y = SCREEN_HEIGHT / 2;
+        b->speed_y *= random_speed[GetRandomValue(0,1)];
+        b->speed_x *= random_speed[GetRandomValue(0,1)];
+        (*cpu_score)++;
+
     }
 }
 
@@ -77,12 +94,14 @@ void CPU_Move(paddle *p, int speed, ball * b){
     // to move the non-user paddle, just moves up and down
     // paddle should move up and down once it has reached bottom or top of window.
     if (p->y + p->height > b->y ){
-        p->y = p->y - (speed);
+        p->y = p->y - (speed-0.1);
     }
     else{
-        p->y = p->y + (speed);
+        p->y = p->y + (speed-0.1);
     }
 }
+
+
 
 int main(){
 
@@ -91,6 +110,7 @@ int main(){
     paddle p1;
     paddle p2;
     ball b;
+    int player_score = 0, cpu_score = 0;
     p1.x = 0;
     p1.y = 400;
     p2.x = 770;
@@ -114,12 +134,14 @@ int main(){
         eventHandling(&p1, speed);
         CPU_Move(&p2, speed, &b);
         // Collision detection
-        ball_collision_Detection(&b, SCREEN_HEIGHT);
+        ball_collision_Detection(&b, &player_score, &cpu_score);
         ball_Paddle_collision(&p1, &p2, &b);
   
         BeginDrawing();
             ClearBackground(BLACK);
             DrawText("Pong", 380, 0, 24, WHITE);
+            DrawText(TextFormat("%i", player_score), SCREEN_WIDTH/4 -40, 20 , 24, PURPLE);
+            DrawText(TextFormat("%i", cpu_score), 3 * SCREEN_WIDTH/4 - 20 , 20 , 24, PURPLE);
             DrawLine(SCREEN_WIDTH/2, 0, SCREEN_WIDTH /2, SCREEN_HEIGHT, WHITE);
             DrawCircle(b.x, b.y, b.radius, PURPLE);
             DrawRectangle(p1.x, p1.y, p1.width, p1.height, GREEN);
