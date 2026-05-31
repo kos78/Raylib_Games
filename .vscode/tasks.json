@@ -8,7 +8,7 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileBasenameNoExtension}",
+                "${fileBasenameNoExtension}.exe",
                 "-IC:/raylib/raylib/src",
                 "-LC:/raylib/raylib/src",
                 "-lraylib",
@@ -17,7 +17,7 @@
                 "-lwinmm"
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${fileDirname}"
             },
             "problemMatcher": [
                 "$gcc"
