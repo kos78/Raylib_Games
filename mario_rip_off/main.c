@@ -103,8 +103,8 @@ bool quit_button_Pressed(Rectangle quitButton){
 
 int main(){
     InitWindow(MAP_COLS * TILE_SIZE, MAP_ROWS * TILE_SIZE, "Pete's Pizza");
-    printf("Working directory: %s\n", GetWorkingDirectory());
     SetTargetFPS(60);
+
     bool st_clicked;
     bool qt_clicked;
     state game_state = MENU;
@@ -143,7 +143,7 @@ int main(){
             Draw_Quit_Button(quitButton);
             st_clicked = start_button_Pressed(startButton);
             qt_clicked = quit_button_Pressed(quitButton);
-            printf("%d", st_clicked);
+            
             if (st_clicked == true){
                 printf("H");
                 game_state = GAME;
@@ -163,13 +163,14 @@ int main(){
                 
             }
             else if (game_state == QUIT){
-                CloseWindow();
+                break;
             }
             
             
         EndDrawing();
 
     }
+    CloseWindow();
      
     return 0;
 }
