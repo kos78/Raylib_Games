@@ -19,47 +19,53 @@ typedef enum state{
 }state;
 
 typedef struct Button{
-    int height;
-    int width;
     int x;
     int y;
-    char colour[50];
+    int height;
+    int width;
+    Color colour;
+    const char *text;
 } Button;
 
-void Draw_Start_Button(Rectangle startButton){
-    DrawRectangleRounded(startButton, 0.2f, 10, GREEN);
-    const char *text = "START";
-    int fontsize = 24;
-    int textWidth = MeasureText(text, fontsize);
-
-    int textX = startButton.x + (startButton.width - textWidth) / 2;
-    int textY = startButton.y + (startButton.height - fontsize) / 2;
-
-    DrawText(text, textX, textY, fontsize, WHITE);
-}
-void Draw_Quit_Button(Rectangle quitbutton){
-    DrawRectangleRounded(quitbutton, 0.2f, 10, RED);
-    const char *text = "Quit";
-    int fontsize = 24;
-    int textWidth = MeasureText(text, fontsize);
-
-    int textX = quitbutton.x + (quitbutton.width - textWidth) / 2;
-    int textY = quitbutton.y + (quitbutton.height - fontsize) / 2;
-
-    DrawText(text, textX, textY, fontsize, WHITE);
-}
-bool start_button_Pressed(Rectangle startButton){
+void Draw_Start_Button(Button *sb){
     
+}
+void Draw_Quit_Button(Button *qb){
+    Rectangle rec = {qb->x, qb->y, qb->height, qb->width};
+    DrawRectangleRounded(rec, 0.2f, 10, qb->colour);
+
+    int fontsize = 24;
+    int textWidth = MeasureText(qb->text, fontsize);
     
-    bool hovering = CheckCollisionPointRec(GetMousePosition(), startButton);
-    if (hovering) {
-        DrawRectangleRec(startButton, GREEN); 
-        DrawText("START", 360, 215, 24, WHITE);
-     } // changes color if hovering
+    int textX = qb->x + (qb->width - textWidth) / 2;
+    int textY = qb->y + (qb->height - fontsize) / 2;
+
+    DrawText(qb->text, textX, textY, fontsize, WHITE);
+}
+bool button_pressed(Button *btn){
+    printf("%u\n", btn->colour);
+    Rectangle rec = {btn->x, btn->y, btn->height, btn->width,};
+    DrawRectangleRounded(rec, 0.2f, 10, btn->colour);
+
+    int fontsize = 24;
+    int textWidth = MeasureText(btn->text, fontsize);
+
+    int textX = btn->x + (btn->width - textWidth) / 2;
+    int textY = btn->y + (btn->height - fontsize) / 2;
+
+   
+    bool hovering = CheckCollisionPointRec(GetMousePosition(), rec); // checks if mouse is in rectangle
+    if (hovering == false) { // if the mouse isn't hovering over the button
+        btn->colour = btn->colour; // should be the buttons original colour
+        
+     } // changes color if hovering 
     else {
-        DrawRectangleRec(startButton, DARKGREEN); 
-        DrawText("START", 360, 215, 24, WHITE);
+        DrawRectangleRounded(rec, 0.2f, 10, ColorBrightness(btn->colour, -0.3f));// darker shade
+        
     }
+
+     DrawText(btn->text, textX, textY, 100, WHITE);
+    
 
     if(hovering && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) // if buttoned clicked
     {
@@ -73,17 +79,20 @@ bool start_button_Pressed(Rectangle startButton){
     
 }
 
-bool quit_button_Pressed(Rectangle quitButton){
+bool quit_button_Pressed(Button *quitButton){
     
-    
-    bool hovering = CheckCollisionPointRec(GetMousePosition(), quitButton);
+    Rectangle rec = {quitButton->x, quitButton->y, quitButton->height, quitButton->width,};
+
+    bool hovering = CheckCollisionPointRec(GetMousePosition(), rec);
     if (hovering) {
-        DrawRectangleRec(quitButton, RED); 
-        DrawText("QUIT", 360, 315, 24, WHITE);
+        quitButton->colour = BLUE;
+        // DrawRectangleRec(quitButton, RED); 
+        // DrawText("QUIT", 360, 315, 24, WHITE);
      } // changes color if hovering
     else {
-        DrawRectangleRec(quitButton, DARKBLUE); 
-        DrawText("QUIT", 360, 315, 24, WHITE);
+        quitButton->colour = DARKBLUE;
+        // DrawRectangleRec(quitButton, DARKBLUE); 
+        // DrawText("QUIT", 360, 315, 24, WHITE);
     }
 
     if(hovering && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) // if buttoned clicked
@@ -109,9 +118,10 @@ int main(){
     bool qt_clicked;
     state game_state = MENU;
 
-    Rectangle startButton = {300, 200, 200, 50};
-    Rectangle quitButton = {300, 200, 200, 150};
-    
+    //Rectangle startButton = {300, 200, 200, 50};
+    //Rectangle quitButton = {300, 200, 200, 150};
+    Button startButton = {200,200, 100, 60, GREEN}; // x, y, height, width
+    Button quitButton = {300, 200, 300, 150, BLUE};
     Texture bg = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//start_background.png");
 
     Texture2D tiles[4];
@@ -139,10 +149,10 @@ int main(){
         BeginDrawing();
             ClearBackground(BLACK);
             DrawTexture(bg, 0, 0, WHITE);
-            Draw_Start_Button(startButton);
-            Draw_Quit_Button(quitButton);
-            st_clicked = start_button_Pressed(startButton);
-            qt_clicked = quit_button_Pressed(quitButton);
+            // Draw_Start_Button(&startButton);
+            //Draw_Quit_Button(&quitButton);
+            st_clicked = button_pressed(&startButton);
+            qt_clicked = button_pressed(&quitButton);
             
             if (st_clicked == true){
                 printf("H");
