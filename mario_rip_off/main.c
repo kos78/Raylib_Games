@@ -27,85 +27,29 @@ typedef struct Button{
     const char *text;
 } Button;
 
-void Draw_Start_Button(Button *sb){
-    
-}
-void Draw_Quit_Button(Button *qb){
-    Rectangle rec = {qb->x, qb->y, qb->height, qb->width};
-    DrawRectangleRounded(rec, 0.2f, 10, qb->colour);
 
-    int fontsize = 24;
-    int textWidth = MeasureText(qb->text, fontsize);
-    
-    int textX = qb->x + (qb->width - textWidth) / 2;
-    int textY = qb->y + (qb->height - fontsize) / 2;
-
-    DrawText(qb->text, textX, textY, fontsize, WHITE);
-}
 bool button_pressed(Button *btn){
-    printf("%u\n", btn->colour);
+    // draw the button
     Rectangle rec = {btn->x, btn->y, btn->height, btn->width,};
-    DrawRectangleRounded(rec, 0.2f, 10, btn->colour);
-
+    
     int fontsize = 24;
     int textWidth = MeasureText(btn->text, fontsize);
 
     int textX = btn->x + (btn->width - textWidth) / 2;
-    int textY = btn->y + (btn->height - fontsize) / 2;
-
-   
+    int textY = btn->y + (btn->height - textWidth) / 2;
+    // button interaction
     bool hovering = CheckCollisionPointRec(GetMousePosition(), rec); // checks if mouse is in rectangle
-    if (hovering == false) { // if the mouse isn't hovering over the button
-        btn->colour = btn->colour; // should be the buttons original colour
-        
-     } // changes color if hovering 
-    else {
-        DrawRectangleRounded(rec, 0.2f, 10, ColorBrightness(btn->colour, -0.3f));// darker shade
-        
-    }
+    
+    Color drawcolour = hovering ?  ColorBrightness(btn->colour, -0.3f) : btn->colour; // if the mouse is hovering over the button
+    DrawRectangleRounded(rec, 0.2f, 10, drawcolour);
 
-     DrawText(btn->text, textX, textY, 100, WHITE);
+    DrawText(btn->text, textX, textY, 20, WHITE);
     
 
-    if(hovering && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) // if buttoned clicked
-    {
-        TraceLog(LOG_INFO, "Start Pressed");
-        
-        return true;
-    }
-    else{
-        return false;
-    }
-    
+   return  hovering && IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
 }
 
-bool quit_button_Pressed(Button *quitButton){
-    
-    Rectangle rec = {quitButton->x, quitButton->y, quitButton->height, quitButton->width,};
 
-    bool hovering = CheckCollisionPointRec(GetMousePosition(), rec);
-    if (hovering) {
-        quitButton->colour = BLUE;
-        // DrawRectangleRec(quitButton, RED); 
-        // DrawText("QUIT", 360, 315, 24, WHITE);
-     } // changes color if hovering
-    else {
-        quitButton->colour = DARKBLUE;
-        // DrawRectangleRec(quitButton, DARKBLUE); 
-        // DrawText("QUIT", 360, 315, 24, WHITE);
-    }
-
-    if(hovering && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) // if buttoned clicked
-    {
-        TraceLog(LOG_INFO, "Quit Pressed");
-        
-        return true;
-    }
-    else{
-        return false;
-    }
-    
-}
 
 
 
@@ -120,8 +64,8 @@ int main(){
 
     //Rectangle startButton = {300, 200, 200, 50};
     //Rectangle quitButton = {300, 200, 200, 150};
-    Button startButton = {200,200, 100, 60, GREEN}; // x, y, height, width
-    Button quitButton = {300, 200, 300, 150, BLUE};
+    Button startButton = {200, 200, 100, 60, RED, "START"}; // x, y, height, width
+    Button quitButton = {700, 200, 100, 60, RED, "QUIT"};
     Texture bg = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//start_background.png");
 
     Texture2D tiles[4];
