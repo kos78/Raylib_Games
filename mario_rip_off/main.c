@@ -61,7 +61,7 @@ bool button_pressed(Button *btn)
 void button_Bounce(Button *btn, int bounce)
 {
     btn->y += bounce *btn->direction; // make it bounce down
-    if (btn->y >= btn->y_pos +  20)
+    if (btn->y >= btn->y_pos +  40)
     {
         btn->direction = -1;
         //btn->y += bounce;
@@ -140,7 +140,27 @@ int main()
                 for (int col = 0; col < MAP_COLS; col++)
                 {
                     int tile = map[row][col];
-                    DrawTexture(tiles[tile], col * TILE_SIZE, row * TILE_SIZE, WHITE);
+                    switch(tile){
+                        case 0:
+                            DrawTexture(tiles[0], col *TILE_SIZE, row * TILE_SIZE, WHITE);
+                            break;
+                        case 1:
+                            int above = (row > 0) ? map[row - 1][col] : 0;
+
+                            if(above == 0){
+                                DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){139, 94, 60, 255});
+                                DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){34, 139, 34, 255});
+                                DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){20, 100, 20, 255});
+                            }
+                            else{
+                                DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){139, 94, 60, 255});
+                            }
+                            break;
+                        case 3:
+                            DrawTexture(tiles[3], col *TILE_SIZE, row * TILE_SIZE, WHITE);
+                            
+                            break;
+                    }
                 }
             }
         }
