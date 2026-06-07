@@ -31,6 +31,16 @@ typedef struct Button
     int direction;
 } Button;
 
+typedef struct Platform{
+    int x;
+    int y;
+    int height;
+    int width;
+    int direction;
+    const int y_pos;
+    const int x_pos;
+} Platform;
+
 bool button_pressed(Button *btn)
 {
     // draw the button
@@ -65,11 +75,33 @@ void button_Bounce(Button *btn, int bounce)
     {
         btn->direction = -1;
         //btn->y += bounce;
-        printf("inside speed = %d\n", bounce);
+        
     }
-    if(btn->y <= btn->y_pos +bounce){
+    if(btn->y <= btn->y_pos){
         btn->direction = 1;
     }
+}
+// function to draw any platform in the game
+void drawPlatform(Platform *p){
+    Rectangle rec = {p->x, p->y, p->width, p->height};
+    DrawRectangleRec(rec, (Color){233, 41, 41, 255});
+
+}
+
+void platform_Move(Platform * p, int speed){
+    
+    p->y += speed * p->direction; // make it bounce down
+    if (p->y + p->height >= GetScreenHeight()) // bottom limit
+    {
+        p->direction = -1;
+        
+    }
+    if(p->y <= p->y_pos ) // upper limit
+    {
+        p->direction = 1;
+        printf("%d", p->direction);
+    }
+    
 }
 
 int main()
@@ -93,7 +125,10 @@ int main()
     tiles[2] = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//pizza.png");
     tiles[3] = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//lava.png");
 
-    int speed = 1; // button movement
+    int bounce = 1; // button movement
+    int speed = 1;
+
+    Platform block1 = {480, 96, TILE_SIZE, TILE_SIZE * 2, 1, 96, 480};
 
     int map[MAP_ROWS][MAP_COLS];
     FILE *f = fopen("C://Users//Anas//Raylib_Game//mario_rip_off//map.dat", "r");
@@ -120,8 +155,8 @@ int main()
         // Draw_Quit_Button(&quitButton);
         st_clicked = button_pressed(&startButton);
         qt_clicked = button_pressed(&quitButton);
-        button_Bounce(&startButton, speed);
-        button_Bounce(&quitButton, speed);
+        button_Bounce(&startButton, bounce);
+        button_Bounce(&quitButton, bounce);
 
         if (st_clicked == true)
         {
@@ -147,22 +182,32 @@ int main()
                         case 1:
                             int above = (row > 0) ? map[row - 1][col] : 0;
 
-                            if(above == 0){
+                            if(row == 2){
                                 DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){139, 94, 60, 255});
-                                DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){34, 139, 34, 255});
-                                DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){20, 100, 20, 255});
+                                DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE,15, (Color){34, 139, 34, 255});
+                                //DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, 3, (Color){20, 100, 20, 255});
+                            }
+                            else if (above == 0 && row != 2){
+                                DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){139, 94, 60, 255});
+                                DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, (TILE_SIZE/3), (Color){64, 64, 64, 255});
                             }
                             else{
                                 DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){139, 94, 60, 255});
+                                
                             }
                             break;
+                       
                         case 3:
-                            DrawTexture(tiles[3], col *TILE_SIZE, row * TILE_SIZE, WHITE);
-                            
-                            break;
+                                DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE , (Color){255, 153,51, 255});
+                                //DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, (TILE_SIZE/3), (Color){255, 153,51, 255});
+                                break;
                     }
+                    
+                    
                 }
             }
+            drawPlatform(&block1);
+            platform_Move(&block1, speed);
         }
         else if (game_state == QUIT)
         {
