@@ -31,6 +31,12 @@ typedef struct Button
     int direction;
 } Button;
 
+typedef struct Player{
+    Vector2 position;
+    Texture2D image;
+    float speed;
+}Player;
+
 typedef struct Platform{
     int x;
     int y;
@@ -40,6 +46,26 @@ typedef struct Platform{
     const int y_pos;
     const int x_pos;
 } Platform;
+
+void player_Movement(Player * p){
+    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))
+    {
+        p->position.x -= p->speed;
+    }
+    if(IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
+    {
+        p->position.x += p->speed;
+    }
+    if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))
+    {
+        p->position.y -= p->speed;
+    }
+    if(IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
+    {
+        p->position.y -= p->speed;
+    }
+}
+
 
 bool button_pressed(Button *btn)
 {
