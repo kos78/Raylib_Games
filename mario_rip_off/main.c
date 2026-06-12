@@ -33,7 +33,7 @@ typedef struct Button
 
 typedef struct Player{
     Vector2 position;
-    Texture2D image;
+    const char * image;
     float speed;
 }Player;
 
@@ -46,6 +46,18 @@ typedef struct Platform{
     const int y_pos;
     const int x_pos;
 } Platform;
+
+//function to draw player
+void drawPlayer(Player * player, Texture img){
+     
+    Rectangle source = (Rectangle){0, 0, 265, 443};
+    Rectangle dest = (Rectangle){player->position.x, player->position.y, 64, 64};
+    Vector2 origin = {0, 0};
+    DrawTexturePro(img, source, dest,origin ,45, WHITE );
+
+    //DrawTexture(img, player->position.x, player->position.y, WHITE);
+    
+}
 
 void player_Movement(Player * p){
     if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))
@@ -62,7 +74,7 @@ void player_Movement(Player * p){
     }
     if(IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
     {
-        p->position.y -= p->speed;
+        p->position.y += p->speed;
     }
 }
 
@@ -145,6 +157,8 @@ int main()
     Button quitButton = {700, 200, 100, 60, RED, "QUIT", 200, 1};
     Texture bg = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//start_background.png");
 
+    Player mc = {{480,96}, "C://Users//Anas//Raylib_Game//mario_rip_off//left_standing.png", 4};
+    Texture img = LoadTexture(mc.image);
     Texture2D tiles[4];
     tiles[0] = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//sky.png");
     tiles[1] = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//ground.png");
@@ -152,7 +166,7 @@ int main()
     tiles[3] = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//lava.png");
 
     int bounce = 1; // button movement
-    int speed = 1;
+    int speed = 3;
 
     Platform block1 = {480, 96, TILE_SIZE, TILE_SIZE * 2, 1, 96, 480};
 
@@ -233,7 +247,9 @@ int main()
                 }
             }
             drawPlatform(&block1);
+            drawPlayer(&mc, img);
             platform_Move(&block1, speed);
+            player_Movement(&mc);
         }
         else if (game_state == QUIT)
         {
