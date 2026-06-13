@@ -33,7 +33,7 @@ typedef struct Button
 
 typedef struct Player{
     Vector2 position;
-    const char * image;
+    Texture2D image;
     float speed;
 }Player;
 
@@ -48,12 +48,12 @@ typedef struct Platform{
 } Platform;
 
 //function to draw player
-void drawPlayer(Player * player, Texture img){
+void drawPlayer(Player * player){
      
     Rectangle source = (Rectangle){0, 0, 265, 443};
     Rectangle dest = (Rectangle){player->position.x, player->position.y, 64, 64};
     Vector2 origin = {0, 0};
-    DrawTexturePro(img, source, dest,origin ,45, WHITE );
+    DrawTexturePro(player->image, source, dest,origin ,0, WHITE );
 
     //DrawTexture(img, player->position.x, player->position.y, WHITE);
     
@@ -62,6 +62,7 @@ void drawPlayer(Player * player, Texture img){
 void player_Movement(Player * p){
     if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))
     {
+        p->image = LoadTexture("C:.//Users//Anas//Raylib_Game//mario_rip_off//left_standing.png");
         p->position.x -= p->speed;
     }
     if(IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
@@ -137,7 +138,7 @@ void platform_Move(Platform * p, int speed){
     if(p->y <= p->y_pos ) // upper limit
     {
         p->direction = 1;
-        printf("%d", p->direction);
+        
     }
     
 }
@@ -157,8 +158,8 @@ int main()
     Button quitButton = {700, 200, 100, 60, RED, "QUIT", 200, 1};
     Texture bg = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//start_background.png");
 
-    Player mc = {{480,96}, "C://Users//Anas//Raylib_Game//mario_rip_off//left_standing.png", 4};
-    Texture img = LoadTexture(mc.image);
+    Player mc = {{0,0}, LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//player_standing_right.png"), 4}; // starts at top left.
+    
     Texture2D tiles[4];
     tiles[0] = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//sky.png");
     tiles[1] = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//ground.png");
@@ -191,8 +192,6 @@ int main()
         BeginDrawing();
         ClearBackground(BLACK);
         DrawTexture(bg, 0, 0, WHITE);
-        // Draw_Start_Button(&startButton);
-        // Draw_Quit_Button(&quitButton);
         st_clicked = button_pressed(&startButton);
         qt_clicked = button_pressed(&quitButton);
         button_Bounce(&startButton, bounce);
@@ -247,7 +246,7 @@ int main()
                 }
             }
             drawPlatform(&block1);
-            drawPlayer(&mc, img);
+            drawPlayer(&mc);
             platform_Move(&block1, speed);
             player_Movement(&mc);
         }
