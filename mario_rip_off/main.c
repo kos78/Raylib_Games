@@ -41,6 +41,14 @@ typedef struct Platform{
     const int x_pos;
 } Platform;
 
+typedef struct Item{
+    int x;
+    int y;
+    int direction;
+    int total_collected;
+    Texture2D image;
+}Item;
+
 bool button_pressed(Button *btn)
 {
     // draw the button
@@ -104,6 +112,12 @@ void platform_Move(Platform * p, int speed){
     
 }
 
+void draw_collectable(Item * i){
+    
+
+}
+
+
 int main()
 {
     InitWindow(MAP_COLS * TILE_SIZE, MAP_ROWS * TILE_SIZE, "Pete's Pizza");
@@ -118,7 +132,7 @@ int main()
     Button startButton = {200, 200, 100, 60, RED, "START", 200, 1}; // x, y, height, width
     Button quitButton = {700, 200, 100, 60, RED, "QUIT", 200, 1};
     Texture bg = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//start_background.png");
-
+    Item pizza = {0, 100, 1, 0 , LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//pizza.png")};
     Texture2D tiles[4];
     tiles[0] = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//sky.png");
     tiles[1] = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//ground.png");
