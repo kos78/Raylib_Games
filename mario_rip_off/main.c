@@ -16,7 +16,8 @@ typedef enum state
 {
     MENU,
     GAME,
-    QUIT
+    QUIT,
+    LEVEL_2
 } state;
 
 typedef struct Button
@@ -49,6 +50,18 @@ typedef struct Item{
     Texture2D image;
 }Item;
 
+typedef struct {
+    Texture2D spritesheet;
+    int frameWidth;
+    int frameHeight;
+    int currentFrame;
+    int currentRow;
+    int lastFrameInRow;
+    float frameTimer;
+    float frameSpeed;
+}Player;
+
+
 bool button_pressed(Button *btn)
 {
     // draw the button
@@ -78,10 +91,10 @@ bool button_pressed(Button *btn)
 // function that makes the loading screen buttons move up and down like in old 2d games
 void button_Bounce(Button *btn, int bounce)
 {
-    btn->y += bounce *btn->direction; // make it bounce down
-    if (btn->y >= btn->y_pos +  40)
+    btn->y += bounce *btn->direction; // make the button move downwards
+    if (btn->y >= btn->y_pos +  40) // lower limit
     {
-        btn->direction = -1;
+        btn->direction = -1; // reverse direction
         //btn->y += bounce;
         
     }
@@ -93,6 +106,30 @@ void button_Bounce(Button *btn, int bounce)
 void drawPlatform(Platform *p){
     Rectangle rec = {p->x, p->y, p->width, p->height};
     DrawRectangleRec(rec, (Color){233, 41, 41, 255});
+
+}
+
+void drawPlayer(Player * player, Vector2 pos, bool facingLeft){
+    Rectangle sourceRec = {
+        player->currentFrame * player->frameWidth,
+        player->currentRow * player->frameHeight,
+        player->frameWidth,
+        player->frameHeight
+
+    };
+    if (facingLeft){
+        sourceRec.width = -player->frameWidth;
+    }
+
+    DrawTextureRec(player->spritesheet, sourceRec, pos, WHITE);
+
+}
+
+void draw_collectable(Item * i){
+    Rectangle source = (Rectangle){0, 0, 792, 760};
+    Rectangle dest = (Rectangle){i->x, i->y, 0, 0};
+    Vector2 origin = {0,0};
+    DrawTexturePro(i->image, source, dest, origin, 0, WHITE);
 
 }
 
@@ -112,9 +149,31 @@ void platform_Move(Platform * p, int speed){
     
 }
 
-void draw_collectable(Item * i){
-    
+void updatePlayerAnimation(Player * player, bool isMoving){
+    int previousRow = player->currentRow;
 
+    if(isMoving){
+        player->currentRow = 1; // assign player->row t the row with running animation
+        player->lastFrameInRow = 8;
+    }
+    else{
+        player->currentRow = 0; // assign walking animation
+        player->lastFrameInRow = 8;
+    }
+
+    if(player->currentRow != previousRow){
+        player->currentFrame = 0;
+        player->frameTimer = 0;
+    }
+
+    player->frameTimer += GetFrameTime();
+    if(player->frameTimer >= player->frameSpeed){
+        player->frameTimer = 0;
+        player->currentFrame++;
+    }
+    if(player->currentFrame > player->lastFrameInRow){ // if frame sequence completed 
+        player->currentFrame = 0; // reset
+    }
 }
 
 
@@ -143,6 +202,19 @@ int main()
     int speed = 1;
 
     Platform block1 = {480, 96, TILE_SIZE, TILE_SIZE * 2, 1, 96, 480};
+    Player player = {0}; // initialises all member features to 0 before explicit declaration
+    player.spritesheet = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//spritesheet (2).png");
+    if (player.spritesheet.id == 0){
+        printf("Failure\n");
+    }
+    player.frameWidth = 256;
+    player.frameHeight = 512;
+    player.lastFrameInRow = 8; // no.of frames in row
+    player.frameSpeed = 0.15f;
+
+    bool isMoving = IsKeyDown(KEY_D) || IsKeyDown(KEY_A);
+    bool facingLeft = IsKeyDown(KEY_A);
+    Vector2 playerPos = {50, 10};
 
     int map[MAP_ROWS][MAP_COLS];
     FILE *f = fopen("C://Users//Anas//Raylib_Game//mario_rip_off//map.dat", "r");
@@ -194,7 +266,7 @@ int main()
                             DrawTexture(tiles[0], col *TILE_SIZE, row * TILE_SIZE, WHITE);
                             break;
                         case 1:
-                            int above = (row > 0) ? map[row - 1][col] : 0;
+                            int above = (row > 0) ? map[row - 1][col] : 0; // checks to see if the tiles are part of the surface
 
                             if(row == 2){
                                 DrawRectangle(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){139, 94, 60, 255});
@@ -221,7 +293,11 @@ int main()
                 }
             }
             drawPlatform(&block1);
+            draw_collectable(&pizza);
             platform_Move(&block1, speed);
+            updatePlayerAnimation(&player, isMoving);
+            drawPlayer(&player, playerPos, facingLeft);
+            printf("Texture: %d x %d\n", player.spritesheet.width, player.spritesheet.height);
         }
         else if (game_state == QUIT)
         {
