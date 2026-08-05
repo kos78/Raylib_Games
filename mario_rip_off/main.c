@@ -109,7 +109,7 @@ void drawPlatform(Platform *p){
 
 }
 
-void drawPlayer(Player * player, Vector2 pos, bool facingLeft){
+void drawPlayer(Player * player, Vector2 pos, bool facingLeft, float scale){
     Rectangle sourceRec = {
         player->currentFrame * player->frameWidth,
         player->currentRow * player->frameHeight,
@@ -117,11 +117,20 @@ void drawPlayer(Player * player, Vector2 pos, bool facingLeft){
         player->frameHeight
 
     };
+    Rectangle destRec = {
+        pos.x,
+        pos.y,
+        player->frameWidth * scale,
+        player->frameHeight * scale
+    };
+
+    Vector2 origin = {0, 0};
     if (facingLeft){
         sourceRec.width = -player->frameWidth;
     }
 
-    DrawTextureRec(player->spritesheet, sourceRec, pos, WHITE);
+
+    DrawTexturePro(player->spritesheet, sourceRec, destRec, origin, 0.0f, WHITE);
 
 }
 
@@ -212,9 +221,8 @@ int main()
     player.lastFrameInRow = 8; // no.of frames in row
     player.frameSpeed = 0.15f;
 
-    bool isMoving = IsKeyDown(KEY_D) || IsKeyDown(KEY_A);
-    bool facingLeft = IsKeyDown(KEY_A);
-    Vector2 playerPos = {50, 10};
+    
+    Vector2 playerPos = {30, -40};
 
     int map[MAP_ROWS][MAP_COLS];
     FILE *f = fopen("C://Users//Anas//Raylib_Game//mario_rip_off//map.dat", "r");
@@ -292,12 +300,15 @@ int main()
                     
                 }
             }
+
             drawPlatform(&block1);
             draw_collectable(&pizza);
             platform_Move(&block1, speed);
+            bool isMoving = IsKeyDown(KEY_D) || IsKeyDown(KEY_A);
+            bool facingLeft = IsKeyDown(KEY_A);
             updatePlayerAnimation(&player, isMoving);
-            drawPlayer(&player, playerPos, facingLeft);
-            printf("Texture: %d x %d\n", player.spritesheet.width, player.spritesheet.height);
+            drawPlayer(&player, playerPos, facingLeft, 0.25);
+            
         }
         else if (game_state == QUIT)
         {
