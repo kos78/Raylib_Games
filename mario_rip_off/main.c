@@ -59,6 +59,9 @@ typedef struct {
     int lastFrameInRow;
     float frameTimer;
     float frameSpeed;
+    int speed;
+    int x;
+    int y;
 }Player;
 
 
@@ -109,7 +112,7 @@ void drawPlatform(Platform *p){
 
 }
 
-void drawPlayer(Player * player, Vector2 pos, bool facingLeft, float scale){
+void drawPlayer(Player * player, bool facingLeft, float scale){
     Rectangle sourceRec = {
         player->currentFrame * player->frameWidth,
         player->currentRow * player->frameHeight,
@@ -118,8 +121,8 @@ void drawPlayer(Player * player, Vector2 pos, bool facingLeft, float scale){
 
     };
     Rectangle destRec = {
-        pos.x,
-        pos.y,
+        player->x,
+        player->y,
         player->frameWidth * scale,
         player->frameHeight * scale
     };
@@ -185,6 +188,15 @@ void updatePlayerAnimation(Player * player, bool isMoving){
     }
 }
 
+void playerMove(Player * player,  int speed){
+    if (IsKeyDown(KEY_D)){
+        player->x += speed;
+    }
+    else if (IsKeyDown(KEY_D)){
+        player->x -= speed;
+    }
+    
+}
 
 int main()
 {
@@ -212,6 +224,7 @@ int main()
 
     Platform block1 = {480, 96, TILE_SIZE, TILE_SIZE * 2, 1, 96, 480};
     Player player = {0}; // initialises all member features to 0 before explicit declaration
+    player.speed = 5;
     player.spritesheet = LoadTexture("C://Users//Anas//Raylib_Game//mario_rip_off//spritesheet (2).png");
     if (player.spritesheet.id == 0){
         printf("Failure\n");
@@ -222,7 +235,8 @@ int main()
     player.frameSpeed = 0.15f;
 
     
-    Vector2 playerPos = {30, -40};
+    player.x =  30;
+    player.y = -40;
 
     int map[MAP_ROWS][MAP_COLS];
     FILE *f = fopen("C://Users//Anas//Raylib_Game//mario_rip_off//map.dat", "r");
@@ -307,7 +321,8 @@ int main()
             bool isMoving = IsKeyDown(KEY_D) || IsKeyDown(KEY_A);
             bool facingLeft = IsKeyDown(KEY_A);
             updatePlayerAnimation(&player, isMoving);
-            drawPlayer(&player, playerPos, facingLeft, 0.25);
+            drawPlayer(&player, facingLeft, 0.25);
+            playerMove(&player, speed);
             
         }
         else if (game_state == QUIT)
